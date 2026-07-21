@@ -1,0 +1,374 @@
+.ctp-pro-sortable-trigger {
+  position: relative;
+}
+
+.ctp-pro-sortable-trigger::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.ctp-pro-sortable-trigger:hover::before {
+  opacity: 1;
+}
+
+.ctp-pro-sortable-trigger--dragging {
+  opacity: 0.4 !important;
+  z-index: 999;
+}
+
+/* Disable ::before overlay on table row triggers — it disrupts table cell layout */
+.ctp-pro-table-row-trigger::before {
+  display: none;
+}
+
+.ctp-pro-drag-overlay {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background: var(--ctp-surface0);
+  border: 1px solid var(--ctp-overlay0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: grabbing;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transform: rotate(3deg);
+}
+
+/* ------------------------------------------------------------------ */
+/*  ReorderableTable                                                   */
+/* ------------------------------------------------------------------ */
+
+.ctp-pro-reorderable-table {
+  position: relative;
+}
+
+/* -- Column drag handle ------------------------------------------- */
+
+.ctp-pro-table-col-trigger {
+  position: relative;
+  user-select: none;
+}
+
+.ctp-pro-table-col-trigger--dragging {
+  opacity: 0.4 !important;
+  z-index: 999;
+}
+
+.ctp-pro-table-col-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.25rem;
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.ctp-pro-sortable-trigger:hover .ctp-pro-table-col-drag-handle {
+  opacity: 0.7;
+}
+
+/* -- Row drag handle ---------------------------------------------- */
+
+.ctp-pro-table-row-trigger {
+  position: relative;
+}
+
+.ctp-pro-table-row-drag-handle-cell {
+  width: 40px;
+  text-align: center;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.ctp-pro-table-row-drag-handle-cell:active {
+  cursor: grabbing;
+}
+
+.ctp-pro-table-row-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.3;
+  transition: opacity 0.15s ease;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+tr:hover .ctp-pro-table-row-drag-handle {
+  opacity: 0.7;
+}
+
+.ctp-pro-table-row-trigger--dragging .ctp-pro-table-row-drag-handle {
+  opacity: 1;
+}
+
+.ctp-pro-table-row-trigger--dragging {
+  opacity: 0.5 !important;
+  z-index: 999;
+}
+
+/* -- Column resize handle ----------------------------------------- */
+
+.ctp-pro-table-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  z-index: 1;
+  background: transparent;
+  transition: background 0.15s ease;
+  background-clip: content-box;
+}
+
+.ctp-pro-table-resize-handle:hover,
+.ctp-pro-table-resize-handle--active {
+  background: var(--ctp-table-accent, var(--ctp-mauve));
+  opacity: 0.5;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Kanban Board                                                     */
+/* ------------------------------------------------------------------ */
+
+.ctp-pro-kanban-board {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding: 0.5rem 0.25rem 1.5rem 0.25rem;
+  user-select: none;
+  min-height: 480px;
+  align-items: flex-start;
+}
+
+/* Custom scrollbar for kanban board */
+.ctp-pro-kanban-board::-webkit-scrollbar {
+  height: 8px;
+}
+.ctp-pro-kanban-board::-webkit-scrollbar-track {
+  background: var(--ctp-crust);
+  border-radius: 4px;
+}
+.ctp-pro-kanban-board::-webkit-scrollbar-thumb {
+  background: var(--ctp-surface1);
+  border-radius: 4px;
+}
+.ctp-pro-kanban-board::-webkit-scrollbar-thumb:hover {
+  background: var(--ctp-surface2);
+}
+
+.ctp-pro-kanban-column {
+  flex: 0 0 300px;
+  background: var(--ctp-mantle);
+  border: 1px solid var(--ctp-surface0);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  max-height: 650px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ctp-pro-kanban-column:hover {
+  border-color: var(--ctp-surface1);
+}
+
+.ctp-pro-kanban-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--ctp-surface0);
+  background: rgba(0, 0, 0, 0.08);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  position: relative;
+}
+
+/* Color Accent Bars for Headers */
+.ctp-pro-kanban-column-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.ctp-pro-kanban-column--rosewater .ctp-pro-kanban-column-header::after { background: var(--ctp-rosewater); }
+.ctp-pro-kanban-column--flamingo .ctp-pro-kanban-column-header::after { background: var(--ctp-flamingo); }
+.ctp-pro-kanban-column--pink .ctp-pro-kanban-column-header::after { background: var(--ctp-pink); }
+.ctp-pro-kanban-column--mauve .ctp-pro-kanban-column-header::after { background: var(--ctp-mauve); }
+.ctp-pro-kanban-column--red .ctp-pro-kanban-column-header::after { background: var(--ctp-red); }
+.ctp-pro-kanban-column--maroon .ctp-pro-kanban-column-header::after { background: var(--ctp-maroon); }
+.ctp-pro-kanban-column--peach .ctp-pro-kanban-column-header::after { background: var(--ctp-peach); }
+.ctp-pro-kanban-column--yellow .ctp-pro-kanban-column-header::after { background: var(--ctp-yellow); }
+.ctp-pro-kanban-column--green .ctp-pro-kanban-column-header::after { background: var(--ctp-green); }
+.ctp-pro-kanban-column--teal .ctp-pro-kanban-column-header::after { background: var(--ctp-teal); }
+.ctp-pro-kanban-column--sky .ctp-pro-kanban-column-header::after { background: var(--ctp-sky); }
+.ctp-pro-kanban-column--sapphire .ctp-pro-kanban-column-header::after { background: var(--ctp-sapphire); }
+.ctp-pro-kanban-column--blue .ctp-pro-kanban-column-header::after { background: var(--ctp-blue); }
+.ctp-pro-kanban-column--lavender .ctp-pro-kanban-column-header::after { background: var(--ctp-lavender); }
+
+.ctp-pro-kanban-column-title-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ctp-pro-kanban-column-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.ctp-pro-kanban-column--rosewater .ctp-pro-kanban-column-dot { background: var(--ctp-rosewater); }
+.ctp-pro-kanban-column--flamingo .ctp-pro-kanban-column-dot { background: var(--ctp-flamingo); }
+.ctp-pro-kanban-column--pink .ctp-pro-kanban-column-dot { background: var(--ctp-pink); }
+.ctp-pro-kanban-column--mauve .ctp-pro-kanban-column-dot { background: var(--ctp-mauve); }
+.ctp-pro-kanban-column--red .ctp-pro-kanban-column-dot { background: var(--ctp-red); }
+.ctp-pro-kanban-column--maroon .ctp-pro-kanban-column-dot { background: var(--ctp-maroon); }
+.ctp-pro-kanban-column--peach .ctp-pro-kanban-column-dot { background: var(--ctp-peach); }
+.ctp-pro-kanban-column--yellow .ctp-pro-kanban-column-dot { background: var(--ctp-yellow); }
+.ctp-pro-kanban-column--green .ctp-pro-kanban-column-dot { background: var(--ctp-green); }
+.ctp-pro-kanban-column--teal .ctp-pro-kanban-column-dot { background: var(--ctp-teal); }
+.ctp-pro-kanban-column--sky .ctp-pro-kanban-column-dot { background: var(--ctp-sky); }
+.ctp-pro-kanban-column--sapphire .ctp-pro-kanban-column-dot { background: var(--ctp-sapphire); }
+.ctp-pro-kanban-column--blue .ctp-pro-kanban-column-dot { background: var(--ctp-blue); }
+.ctp-pro-kanban-column--lavender .ctp-pro-kanban-column-dot { background: var(--ctp-lavender); }
+
+.ctp-pro-kanban-column-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ctp-text);
+}
+
+.ctp-pro-kanban-column-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--ctp-surface0);
+  color: var(--ctp-subtext1);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid var(--ctp-surface1);
+}
+
+.ctp-pro-kanban-cards-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  flex-grow: 1;
+  min-height: 200px;
+}
+
+/* Scrollbar for cards container inside column */
+.ctp-pro-kanban-cards-container::-webkit-scrollbar {
+  width: 6px;
+}
+.ctp-pro-kanban-cards-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ctp-pro-kanban-cards-container::-webkit-scrollbar-thumb {
+  background: var(--ctp-surface0);
+  border-radius: 3px;
+}
+.ctp-pro-kanban-cards-container::-webkit-scrollbar-thumb:hover {
+  background: var(--ctp-surface1);
+}
+
+.ctp-pro-kanban-card {
+  background: var(--ctp-base);
+  border: 1px solid var(--ctp-surface0);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  cursor: grab;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  touch-action: none;
+}
+
+.ctp-pro-kanban-card:hover {
+  border-color: var(--ctp-surface1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.ctp-pro-kanban-card:active {
+  cursor: grabbing;
+}
+
+.ctp-pro-kanban-card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ctp-text);
+  margin-bottom: 0.375rem;
+  line-height: 1.4;
+}
+
+.ctp-pro-kanban-card-desc {
+  font-size: 0.775rem;
+  color: var(--ctp-subtext0);
+  line-height: 1.4;
+  margin-bottom: 0.625rem;
+  word-break: break-word;
+}
+
+.ctp-pro-kanban-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.ctp-pro-kanban-card-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--ctp-surface0);
+  color: var(--ctp-subtext1);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.ctp-pro-kanban-card--dragging {
+  opacity: 0.25 !important;
+  border: 1px dashed var(--ctp-overlay0);
+  background: transparent;
+  box-shadow: none;
+}
+
+.ctp-pro-kanban-card--dragging-overlay {
+  background: var(--ctp-base);
+  border: 1px solid var(--ctp-mauve);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  cursor: grabbing;
+  transform: rotate(2.5deg);
+  pointer-events: none;
+}
+
+.ctp-pro-kanban-empty-column-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  border: 2px dashed var(--ctp-surface0);
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--ctp-subtext0);
+  opacity: 0.7;
+}
