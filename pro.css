@@ -344,10 +344,10 @@ tr:hover .ctp-pro-table-row-drag-handle {
 }
 
 .ctp-pro-kanban-card--dragging {
-  opacity: 0.25 !important;
   border: 1px dashed var(--ctp-overlay0);
   background: transparent;
   box-shadow: none;
+  cursor: grabbing;
 }
 
 .ctp-pro-kanban-card--dragging-overlay {

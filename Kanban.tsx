@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDndMonitor, useDroppable, DragOverlay, UniqueIdentifier } from '@dnd-kit/core';
+import { useDndMonitor, useDroppable, DragOverlay } from '@dnd-kit/core';
 import {
   SortableContext,
   useSortable,
@@ -39,12 +39,11 @@ export interface KanbanProps {
 // ---------------------------------------------------------------------------
 interface SortableCardProps {
   item: KanbanItem;
-  isActiveDragging: boolean;
   renderItem?: (item: KanbanItem) => React.ReactNode;
   onClick?: () => void;
 }
 
-function SortableCard({ item, isActiveDragging, renderItem, onClick }: SortableCardProps) {
+function SortableCard({ item, renderItem, onClick }: SortableCardProps) {
   const {
     attributes,
     listeners,
@@ -54,13 +53,20 @@ function SortableCard({ item, isActiveDragging, renderItem, onClick }: SortableC
     isDragging,
   } = useSortable({ id: item.id });
 
-  const dragging = isDragging || isActiveDragging;
+  // Use dnd-kit's local `isDragging` — it's the most reliable source of truth for
+  // whether THIS card is being dragged (it's reset synchronously by dnd-kit's
+  // internal event handlers on drop completion).
+  const dragging = isDragging;
 
   const style: React.CSSProperties = {
     // Disable transformation offset entirely for the actively dragged card placeholder
     transform: dragging ? undefined : CSS.Transform.toString(transform),
     transition,
-    opacity: dragging ? 0.35 : 1,
+    // When dragging, set visibility to hidden but keep the element in the layout.
+    // This eliminates the flicker that opacity-based fades cause during the brief
+    // window between dnd-kit resetting `isDragging` and the parent re-rendering
+    // the new item order. The DragOverlay ghost remains visible the whole time.
+    visibility: dragging ? 'hidden' : 'visible',
   };
 
   return (
@@ -105,7 +111,6 @@ function SortableCard({ item, isActiveDragging, renderItem, onClick }: SortableC
 interface KanbanColumnProps {
   column: KanbanColumn;
   items: KanbanItem[];
-  activeId: UniqueIdentifier | null;
   renderItem?: (item: KanbanItem) => React.ReactNode;
   renderColumnHeader?: (column: KanbanColumn, columnItems: KanbanItem[]) => React.ReactNode;
   onItemClick?: (item: KanbanItem) => void;
@@ -114,7 +119,6 @@ interface KanbanColumnProps {
 function BoardColumn({
   column,
   items,
-  activeId,
   renderItem,
   renderColumnHeader,
   onItemClick,
@@ -145,7 +149,6 @@ function BoardColumn({
             <SortableCard
               key={item.id}
               item={item}
-              isActiveDragging={activeId === item.id}
               renderItem={renderItem}
               onClick={() => onItemClick?.(item)}
             />
@@ -177,7 +180,6 @@ export function Kanban({
   const [internalItems, setInternalItems] = useState<KanbanItem[]>(items);
   const [originalItems, setOriginalItems] = useState<KanbanItem[] | null>(null);
   const [activeItem, setActiveItem] = useState<KanbanItem | null>(null);
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   useEffect(() => {
     setInternalItems(items);
@@ -196,7 +198,6 @@ export function Kanban({
   useDndMonitor({
     onDragStart(event) {
       const { active } = event;
-      setActiveId(active.id);
       setOriginalItems(activeItemsList);
       const item = activeItemsList.find((i) => i.id === active.id);
       if (item) {
@@ -252,11 +253,13 @@ export function Kanban({
     },
     onDragEnd(event) {
       const { active, over } = event;
-      setActiveId(null);
-      setActiveItem(null);
-      setOriginalItems(null);
 
-      if (!over) return;
+      if (!over) {
+        // No drop target — clear state immediately
+        setActiveItem(null);
+        setOriginalItems(null);
+        return;
+      }
 
       const activeIdVal = active.id;
       const overId = over.id;
@@ -264,9 +267,13 @@ export function Kanban({
       const activeCard = activeItemsList.find((i) => i.id === activeIdVal);
       const overCard = activeItemsList.find((i) => i.id === overId);
 
-      if (!activeCard) return;
+      if (!activeCard) {
+        setActiveItem(null);
+        setOriginalItems(null);
+        return;
+      }
 
-      // Reorder items in the same column
+      // Reorder items in the same column FIRST
       if (overCard && activeCard.columnId === overCard.columnId) {
         const activeIndex = activeItemsList.findIndex((i) => i.id === activeIdVal);
         const overIndex = activeItemsList.findIndex((i) => i.id === overId);
@@ -275,14 +282,19 @@ export function Kanban({
           handleItemsChange(reordered);
         }
       }
+
+      // Clear drag state. Card visual state is now driven entirely by dnd-kit's
+      // `useSortable` `isDragging` flag (set inside each SortableCard), which is
+      // reset synchronously by dnd-kit's internal event handlers on drop completion.
+      setActiveItem(null);
+      setOriginalItems(null);
     },
     onDragCancel() {
-      setActiveId(null);
-      setActiveItem(null);
       if (originalItems) {
         handleItemsChange(originalItems);
-        setOriginalItems(null);
       }
+      setActiveItem(null);
+      setOriginalItems(null);
     },
   });
 
@@ -295,7 +307,6 @@ export function Kanban({
             key={column.id}
             column={column}
             items={columnItems}
-            activeId={activeId}
             renderItem={renderItem}
             renderColumnHeader={renderColumnHeader}
             onItemClick={onItemClick}
